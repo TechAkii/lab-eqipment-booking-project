@@ -1,0 +1,97 @@
+```html {% extends "base.html" %} {% block title %}Equipment Catalogue | UniLab Central{% endblock %} {% block content %}
+<section class="container py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <span class="eyebrow">UNIVERSITY LABORATORY</span>
+            <h1 class="mt-2">Equipment Catalogue</h1>
+            <p class="muted">
+                Explore laboratory equipment and request a booking.
+            </p>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %} {% for category, message in messages %}
+    <div class="alert alert-{{ category }}" role="alert">
+        {{ message }}
+    </div>
+    {% endfor %} {% endwith %}
+
+    <form method="get" action="{{ url_for('catalogue') }}" class="row g-3 mb-4">
+        <div class="col-md-6">
+            <label for="q" class="form-label">Search equipment</label>
+            <input type="text" id="q" name="q" class="form-control" placeholder="Search by equipment name or description" value="{{ request.args.get('q', '') }}">
+        </div>
+
+        <div class="col-md-4">
+            <label for="category" class="form-label">Category</label>
+            <select id="category" name="category" class="form-select">
+                <option value="">All categories</option>
+                {% for category in categories %}
+                    <option
+                        value="{{ category }}"
+                        {% if request.args.get('category', '') == category %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ category }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">
+                Search
+            </button>
+        </div>
+    </form>
+
+    {% if equipment_items %}
+    <div class="row g-4">
+        {% for item in equipment_items %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <span class="badge bg-light text-dark align-self-start">
+                                {{ item.category }}
+                            </span>
+
+                    <h5 class="card-title mt-3">
+                        {{ item.name }}
+                    </h5>
+
+                    <p class="card-text">
+                        {{ item.description or "No description available." }}
+                    </p>
+
+                    <p>
+                        <strong>Status:</strong> {% if item.status == "Available" %}
+                        <span class="text-success">
+                                        Available
+                                    </span> {% else %}
+                        <span class="text-danger">
+                                        {{ item.status }}
+                                    </span> {% endif %}
+                    </p>
+
+                    <div class="mt-auto">
+                        {% if item.status == "Available" %}
+                        <a href="{{ url_for('new_booking', equipment_id=item.id) }}" class="btn btn-primary w-100">
+                                        Book Now
+                                    </a> {% else %}
+                        <button class="btn btn-secondary w-100" disabled>
+                                        Unavailable
+                                    </button> {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        No equipment matches your search.
+    </div>
+    {% endif %}
+</section>
+{% endblock %} ```

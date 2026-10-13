@@ -1,0 +1,97 @@
+```html {% extends "base.html" %} {% block title %}Request Booking | UniLab Central{% endblock %} {% block content %}
+<section class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="mb-4">
+                <span class="eyebrow">EQUIPMENT RESERVATION</span>
+                <h1 class="mt-2">Request a Booking</h1>
+                <p class="muted">
+                    Select your equipment and the time you need it.
+                </p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %} {% for category, message in messages %}
+            <div class="alert alert-{{ category }}" role="alert">
+                {{ message }}
+            </div>
+            {% endfor %} {% endwith %}
+
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <form method="post" action="{{ url_for('new_booking') }}">
+                        <div class="mb-3">
+                            <label for="equipment_id" class="form-label">
+                                Equipment
+                            </label>
+
+                            <select id="equipment_id" name="equipment_id" class="form-select" required>
+                                <option value="">Select equipment</option>
+
+                                {% for item in equipment_items %}
+                                    {% if item.status == "Available" %}
+                                        <option
+                                            value="{{ item.id }}"
+                                            {% if selected_equipment_id|string == item.id|string %}
+                                                selected
+                                            {% endif %}
+                                        >
+                                            {{ item.name }} — {{ item.category }}
+                                        </option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="booking_date" class="form-label">
+                                Booking date
+                            </label>
+
+                            <input type="date" id="booking_date" name="booking_date" class="form-control" min="{{ today }}" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="start_time" class="form-label">
+                                    Start time
+                                </label>
+
+                                <input type="time" id="start_time" name="start_time" class="form-control" required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="end_time" class="form-label">
+                                    End time
+                                </label>
+
+                                <input type="time" id="end_time" name="end_time" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <strong>Booking rules</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>Bookings must last at least 30 minutes.</li>
+                                <li>Bookings cannot exceed 4 hours.</li>
+                                <li>The date and start time cannot be in the past.</li>
+                                <li>Overlapping Pending or Approved bookings are not allowed.</li>
+                                <li>Your request must be approved by staff.</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                Submit Booking Request
+                            </button>
+
+                            <a href="{{ url_for('catalogue') }}" class="btn btn-outline-secondary">
+                                Back to Catalogue
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %} ```
