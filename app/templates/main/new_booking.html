@@ -1,0 +1,83 @@
+ {% extends "base.html" %} {% block title %}Request Booking | UniLab Central{% endblock %} {% block content %}
+<div class="container py-4">
+    <div class="mb-4">
+        <a class="btn btn-outline-secondary" href="{{ url_for('catalogue') }}">
+            &larr; Back to Catalogue
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h1 class="h3 mb-2">Request Equipment Booking</h1>
+                    <p class="text-muted">
+                        Choose your equipment and preferred booking time.
+                    </p>
+
+                    {% with messages = get_flashed_messages(with_categories=true) %} {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                    {% endfor %} {% endwith %}
+
+                    <form method="POST" action="{{ url_for('new_booking') }}">
+
+                        <div class="mb-3">
+                            <label for="equipment_id" class="form-label">
+                                Equipment
+                            </label>
+
+                            <select id="equipment_id" name="equipment_id" class="form-select" required>
+                                <option value="">Select equipment</option>
+
+                                {% for item in equipment_items %}
+                                    {% if item.status == "Available" %}
+                                        <option value="{{ item.id }}">
+                                            {{ item.name }} — {{ item.category }}
+                                        </option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="booking_date" class="form-label">
+                                Booking date
+                            </label>
+
+                            <input type="date" id="booking_date" name="booking_date" class="form-control" min="{{ today }}" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="start_time" class="form-label">
+                                    Start time
+                                </label>
+
+                                <input type="time" id="start_time" name="start_time" class="form-control" required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="end_time" class="form-label">
+                                    End time
+                                </label>
+
+                                <input type="time" id="end_time" name="end_time" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            Booking duration must be between 30 minutes and 4 hours. Your request will be pending until staff review it.
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            Submit Booking Request
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

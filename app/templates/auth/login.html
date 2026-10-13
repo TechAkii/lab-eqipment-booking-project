@@ -1,0 +1,63 @@
+ {% extends "base.html" %} {% block title %}Sign In | UniLab Central{% endblock %} {% block content %}
+<section class="auth-layout">
+    <div class="auth-intro">
+        <span class="eyebrow">SECURE UNIVERSITY ACCESS</span>
+
+        <h1>Welcome back to your lab workspace.</h1>
+
+        <p>
+            Sign in to browse equipment, request a booking, and track approval status.
+        </p>
+
+        <div class="info-panel">
+            <strong>Before booking</strong>
+            <p class="mb-0">
+                Check equipment availability and make sure your requested time follows the lab booking rules.
+            </p>
+        </div>
+    </div>
+
+    <div class="auth-card">
+        <h2>Sign in</h2>
+
+        <p class="muted">Use your registered university account.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %} {% for category, message in messages %}
+        <div class="alert alert-{{ category }}" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %} {% endwith %}
+
+        <form method="post" action="{{ url_for('auth.login') }}">
+            <input type="hidden" name="next" value="{{ request.args.get('next', '') }}">
+
+            <div class="mb-3">
+                <label class="form-label" for="username">
+                    Username or email
+                </label>
+
+                <input class="form-control" type="text" id="username" name="username" autocomplete="username" value="{{ request.form.get('username', '') }}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="password">
+                    Password
+                </label>
+
+                <input class="form-control" type="password" id="password" name="password" autocomplete="current-password" required>
+            </div>
+
+            <button class="btn btn-primary w-100 btn-lg" type="submit">
+                Sign in securely
+            </button>
+        </form>
+
+        <p class="text-center mt-4 mb-0">
+            New student?
+            <a href="{{ url_for('auth.register') }}">
+                Create an account
+            </a>
+        </p>
+    </div>
+</section>
+{% endblock %}
