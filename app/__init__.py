@@ -204,6 +204,8 @@ def create_app():
             today=today.isoformat(),
         )
 
+
+    
     @app.route("/my-bookings")
     @login_required
     def my_bookings():
@@ -220,5 +222,73 @@ def create_app():
             "main/my_bookings.html",
             bookings=bookings,
         )
+        
+        
+    @app.route("/staff/approvals")
+    @login_required
+    def staff_approvals():
+        if current_user.role != "Staff":
+            flash("Access denied. Staff members only.", "danger")
+            return redirect(url_for("catalogue"))
+
+        pending_bookings = (
+            Booking.query.filter_by(status="Pending")
+            .order_by(Booking.booking_date, Booking.start_time)
+            .all()
+        )
+
+        return render_template(
+            "staff/approvals.html",
+            bookings=pending_bookings,
+        )
+
+    @app.route("/staff/approvals/<int:booking_id>/approve", methods=["POST"])
+    @login_required
+    def approve_booking(booking_id):
+        if current_user.role != "Staff":
+            flash("Access denied. Staff members only.", "danger")
+            return redirect(url_for("catalogue"))
+
+        booking = db.session.get(Booking, booking_id)
+
+        if booking is None:
+            flash("Booking not found.", "danger")
+        elif booking.status != "Pending":
+            flash("This booking has already been reviewed.", "warning")
+        else:
+            booking.status = "Approved"
+            db.session.commit()
+            flash("Booking approved successfully.", "success")
+
+        return redirect(url_for("staff_approvals"))
+
+    @app.route("/staff/approvals/<int:booking_id>/reject", methods=["POST"])
+    @login_required
+    def reject_booking(booking_id):
+        if current_user.role != "Staff":
+            flash("Access denied. Staff members only.", "danger")
+            return redirect(url_for("catalogue"))
+
+        booking = db.session.get(Booking, booking_id)
+
+        if booking is None:
+            flash("Booking not found.", "danger")
+        elif booking.status != "Pending":
+            flash("This booking has already been reviewed.", "warning")
+        else:
+            reason = request.form.get("rejection_reason", "").strip()
+
+            if not reason:
+                flash("Please provide a reason for rejection.", "danger")
+                return redirect(url_for("staff_approvals"))
+
+            booking.status = "Rejected"
+            booking.rejection_reason = reason
+            db.session.commit()
+            flash("Booking rejected successfully.", "success")
+
+        return redirect(url_for("staff_approvals"))
+
+
 
     return app

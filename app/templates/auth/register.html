@@ -1,37 +1,44 @@
-{% extends "base.html" %}
-{% block title %}Register | UniLab Central{% endblock %}
-{% block content %}
+{% extends "base.html" %} {% block title %}Register | UniLab Central{% endblock %} {% block content %}
 <section class="auth-layout">
-  <div class="auth-intro">
-    <span class="eyebrow">STUDENT REGISTRATION</span>
-    <h1>Your next research session starts here.</h1>
-    <p>Create a student account to explore the equipment catalogue and submit booking requests.</p>
-    <div class="info-panel"><strong>Account safety</strong><p class="mb-0">Choose a strong password. Public registration must create Student accounts only; Staff accounts should be provisioned separately.</p></div>
-  </div>
-  <div class="auth-card">
-    <h2>Create student account</h2>
-    <p class="muted">Complete all fields below.</p>
-    <form method="post" action="{{ url_for('auth.register') }}">
-      <div class="mb-3">
-        <label class="form-label" for="username">Username</label>
-        <input class="form-control" id="username" name="username" autocomplete="username" required maxlength="80">
-      </div>
-      <div class="mb-3">
-        <label class="form-label" for="email">University email</label>
-        <input class="form-control" type="email" id="email" name="email" autocomplete="email" required maxlength="120">
-      </div>
-      <div class="mb-3">
-        <label class="form-label" for="password">Password</label>
-        <input class="form-control" type="password" id="password" name="password" autocomplete="new-password" minlength="8" required>
-        <div class="form-text">Use at least 8 characters.</div>
-      </div>
-      <div class="mb-3">
-        <label class="form-label" for="confirm_password">Confirm password</label>
-        <input class="form-control" type="password" id="confirm_password" name="confirm_password" autocomplete="new-password" minlength="8" required>
-      </div>
-      <button class="btn btn-primary w-100 btn-lg" type="submit">Create student account</button>
-    </form>
-    <p class="text-center mt-4 mb-0">Already registered? <a href="{{ url_for('auth.login') }}">Sign in</a></p>
-  </div>
+    <div class="auth-intro">
+        <span class="eyebrow">STUDENT REGISTRATION</span>
+        <h1>Your next research session starts here.</h1>
+        <p>Create a student account to explore the equipment catalogue and submit booking requests.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %} {% for category, message in messages %}
+        <div class="alert alert-{{ category }}" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %} {% endwith %}
+
+        <div class="info-panel"><strong>Account safety</strong>
+            <p class="mb-0">Choose a strong password. Public registration must create Student accounts only; Staff accounts should be provisioned separately.</p>
+        </div>
+    </div>
+    <div class="auth-card">
+        <h2>Create student account</h2>
+        <p class="muted">Complete all fields below.</p>
+        <form method="post" action="{{ url_for('auth.register') }}">
+            <div class="mb-3">
+                <label class="form-label" for="username">Username</label>
+                <input class="form-control" id="username" name="username" autocomplete="username" required maxlength="80">
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="email">University email</label>
+                <input class="form-control" type="email" id="email" name="email" autocomplete="email" required maxlength="120">
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="password">Password</label>
+                <input class="form-control" type="password" id="password" name="password" autocomplete="new-password" minlength="8" required>
+                <div class="form-text">Use at least 8 characters.</div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="confirm_password">Confirm password</label>
+                <input class="form-control" type="password" id="confirm_password" name="confirm_password" autocomplete="new-password" minlength="8" required>
+            </div>
+            <button class="btn btn-primary w-100 btn-lg" type="submit">Create student account</button>
+        </form>
+        <p class="text-center mt-4 mb-0">Already registered? <a href="{{ url_for('auth.login') }}">Sign in</a></p>
+    </div>
 </section>
 {% endblock %}
