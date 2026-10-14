@@ -1,38 +1,58 @@
-{% extends "base.html" %}
-{% block title %}Booking Approvals | UniLab Central{% endblock %}
-{% block content %}
-<section class="hero-row">
-  <div><span class="eyebrow">STAFF WORKSPACE</span><h1>Booking Requests &amp; Approval Queue</h1><p class="muted">Review pending requests and approve or reject reservations.</p></div>
-  <a class="btn btn-outline-primary" href="{{ url_for('staff.add_equipment') }}">＋ Add equipment</a>
+ {% extends "base.html" %} {% block title %}Staff Approvals | UniLab Central{% endblock %} {% block content %}
+<section class="container py-4">
+    <h1>Booking Approvals</h1>
+    <p class="text-muted">
+        Review student requests and approve or reject pending bookings.
+    </p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %} {% for category, message in messages %}
+    <div class="alert alert-{{ category }}" role="alert">
+        {{ message }}
+    </div>
+    {% endfor %} {% endwith %} {% if bookings %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Student</th>
+                    <th>Equipment</th>
+                    <th>Date</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td>{{ booking.user.username }}</td>
+                    <td>{{ booking.equipment.name }}</td>
+                    <td>{{ booking.booking_date.strftime("%Y-%m-%d") }}</td>
+                    <td>{{ booking.start_time.strftime("%I:%M %p") }}</td>
+                    <td>{{ booking.end_time.strftime("%I:%M %p") }}</td>
+                    <td>
+                        <form method="post" action="{{ url_for('approve_booking', booking_id=booking.id) }}" class="mb-2">
+                            <button class="btn btn-success btn-sm" type="submit">
+                                        Approve
+                                    </button>
+                        </form>
+
+                        <form method="post" action="{{ url_for('reject_booking', booking_id=booking.id) }}">
+                            <input type="text" name="rejection_reason" class="form-control form-control-sm mb-2" placeholder="Reason for rejection" required>
+                            <button class="btn btn-danger btn-sm" type="submit">
+                                        Reject
+                                    </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        There are no pending booking requests.
+    </div>
+    {% endif %}
 </section>
-<div class="stats-row">
-  <div class="stat-card"><span>Pending requests</span><strong>{{ pending_bookings|length }}</strong><small>Awaiting staff decision</small></div>
-  <div class="stat-card"><span>Equipment units</span><strong>{{ equipment_count }}</strong><small>Listed in catalogue</small></div>
-  <div class="stat-card"><span>Out of service</span><strong>{{ unavailable_count }}</strong><small>Unavailable for booking</small></div>
-</div>
-<div class="section-heading"><h2>Pending requests</h2><span class="muted">Review each request before deciding</span></div>
-<div class="table-responsive data-table-wrap">
-  <table class="table align-middle">
-    <thead><tr><th>Student</th><th>Equipment</th><th>Date</th><th>Time</th><th>Action</th></tr></thead>
-    <tbody>
-      {% for booking in pending_bookings %}
-        <tr>
-          <td>{{ booking.user.username }}</td>
-          <td><strong>{{ booking.equipment.name }}</strong><small class="d-block muted">{{ booking.equipment.category }}</small></td>
-          <td>{{ booking.booking_date.strftime('%d %b %Y') }}</td>
-          <td>{{ booking.start_time.strftime('%H:%M') }}–{{ booking.end_time.strftime('%H:%M') }}</td>
-          <td>
-            <form class="d-inline" method="post" action="{{ url_for('staff.approve_booking', booking_id=booking.id) }}"><button class="btn btn-sm btn-success" type="submit">Approve</button></form>
-            <form class="reject-form mt-2" method="post" action="{{ url_for('staff.reject_booking', booking_id=booking.id) }}">
-              <input class="form-control form-control-sm mb-1" name="rejection_reason" placeholder="Reason for rejection" required>
-              <button class="btn btn-sm btn-outline-danger" type="submit">Reject</button>
-            </form>
-          </td>
-        </tr>
-      {% else %}
-        <tr><td colspan="5"><div class="empty-state compact"><h3>All caught up</h3><p>No pending booking requests.</p></div></td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
 {% endblock %}
