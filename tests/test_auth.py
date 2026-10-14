@@ -72,8 +72,9 @@ def test_register_duplicate_email(client, app):
 
 
 def test_login_successfully(client, app):
-    from app.extensions import db
     from werkzeug.security import generate_password_hash
+
+    from app.extensions import db
 
     with app.app_context():
         user = User(
@@ -99,8 +100,9 @@ def test_login_successfully(client, app):
 
 
 def test_login_invalid_password(client, app):
-    from app.extensions import db
     from werkzeug.security import generate_password_hash
+
+    from app.extensions import db
 
     with app.app_context():
         user = User(
