@@ -191,10 +191,10 @@ Possible booking statuses are:
 | Member | Name | GitHub Profile |
 |---|---|---|
 | Member 1 | Akila Thikshana | https://github.com/TechAkii |
-| Member 2 | Kalana | Add Kalana's GitHub profile link |
+| Member 2 | Kalana | https://github.com/chirankalana2002 |
 | Member 3 | G.H.B.A. Achintha | https://github.com/bhanukaachil |
-| Member 4 | Devindu | Add Devindu's GitHub profile link |
-| Member 5 | Add Member 5's name | Add Member 5's GitHub profile link |
+| Member 4 | Devindu | https://github.com/devindudilshan2003|
+| Member 5 | T.A.W.Anupama | https://github.com/anuwasitha |
 
 ---
 
