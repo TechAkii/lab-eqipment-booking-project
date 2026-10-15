@@ -85,8 +85,7 @@ def login():
 
             next_page = request.form.get("next", "").strip()
 
-            # Accept only local application paths to avoid
-            # redirecting users to external websites.
+            # Allow only local application paths.
             if next_page.startswith("/") and not next_page.startswith("//"):
                 return redirect(next_page)
 
