@@ -148,19 +148,19 @@ Exact endpoint-to-endpoint bookings are allowed.
 For example:
 
 ```text
-Existing booking:  10:00 ───── 11:00
-New booking:                       11:00 ───── 12:00
-                                      ↑
-                                    Allowed
+Existing booking: 10:00 ───── 11:00
+New booking:                  11:00 ───── 12:00
+                              ↑
+                              Allowed
 ```
 
 However:
 
 ```text
-Existing booking:  10:00 ───── 11:00
-New booking:             10:30 ───── 11:30
-                           ↑
-                         Rejected
+Existing booking: 10:00 ───── 11:00
+New booking:           10:30 ───── 11:30
+                       ↑
+                       Rejected
 ```
 
 ---
@@ -188,13 +188,13 @@ Possible booking statuses are:
 
 ## 4. Team Members
 
-| Member | Name | GitHub Username |
+| Member | Name | GitHub Profile |
 |---|---|---|
-| Member 1 | Akila Thikshana | `https://github.com/TechAkii` |
-| Member 2 | Member 2 Name | `member2-github-username` |
-| Member 3 | Member 3 Name | `member3-github-username` |
-| Member 4 | Member 4 Name | `member4-github-username` |
-
+| Member 1 | Akila Thikshana | https://github.com/TechAkii |
+| Member 2 | Kalana | https://github.com/chirankalana2002 |
+| Member 3 | G.H.B.A. Achintha | https://github.com/bhanukaachil |
+| Member 4 | Devindu | https://github.com/devindudilshan2003|
+| Member 5 | T.A.W.Anupama | https://github.com/anuwasitha |
 
 ---
 
@@ -204,13 +204,13 @@ The project responsibilities are divided into five modules.
 
 | Module | Main Responsibility | Assigned Member |
 |---|---|---|
-| M1 | Accounts and Authentication | Member 2 |
-| M2 | Equipment Catalogue | Member 3 |
-| M3 | Booking Form and Booking Model | Member 4 |
-| M4 | Booking Validation and Tests | Akila |
-| M5 | Approval, Integration and CI | Akila |
+| M1 | Accounts and Authentication | Kalana (Member 2) |
+| M2 | Equipment Catalogue | G.H.B.A. Achintha (Member 3) |
+| M3 | Booking Form and Booking Model | Devindu (Member 4) |
+| M4 | Booking Validation and Tests | Akila Thikshana |
+| M5 | Approval, Integration and CI | Akila Thikshana |
 
-### M1 — Accounts and Authentication
+### M1 — Accounts and Authentication (Kalana)
 
 Responsible for:
 
@@ -221,7 +221,7 @@ Responsible for:
 - Student and Staff roles
 - Authentication and authorization
 
-### M2 — Equipment Catalogue
+### M2 — Equipment Catalogue (G.H.B.A. Achintha)
 
 Responsible for:
 
@@ -233,7 +233,7 @@ Responsible for:
 - Equipment status
 - Category filtering
 
-### M3 — Booking Form and Booking Model
+### M3 — Booking Form and Booking Model (Devindu)
 
 Responsible for:
 
@@ -245,7 +245,7 @@ Responsible for:
 - End time
 - Creating booking requests
 
-### M4 — Booking Validation and Tests
+### M4 — Booking Validation and Tests (Akila Thikshana)
 
 Responsible for:
 
@@ -257,7 +257,7 @@ Responsible for:
 - Boundary-value testing
 - Automated tests
 
-### M5 — Approval, Integration and CI
+### M5 — Approval, Integration and CI (Akila Thikshana)
 
 Responsible for:
 
@@ -274,10 +274,10 @@ Responsible for:
 
 | Role | Assigned Member |
 |---|---|
-| Coordinator | Akila |
-| QA Lead | Akila |
-| Review Lead | Member 3 |
-| GitHub/CI Lead | Member 4 |
+| Coordinator | Akila Thikshana |
+| QA Lead | Akila Thikshana |
+| Review Lead | G.H.B.A. Achintha |
+| GitHub/CI Lead | Devindu |
 
 ### Coordinator
 
@@ -336,7 +336,6 @@ The project uses the technologies required by the assignment.
 | Version Control | Git |
 | Repository | GitHub |
 | Continuous Integration | GitHub Actions |
-
 
 ---
 
@@ -765,4 +764,3 @@ GitHub Repository:
 https://github.com/TechAkii/lab-eqipment-booking-project
 
 ---
-
