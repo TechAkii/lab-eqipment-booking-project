@@ -21,6 +21,10 @@ def create_app():
     from app.models import Booking, Equipment, User
     from app.routes.auth import auth
 
+    @app.route("/admin/login", methods=["GET", "POST"])
+    def admin_login():
+        return render_template("admin/login.html")
+
     @login_manager.user_loader
     def load_user(user_id):
         return db.session.get(User, int(user_id))
@@ -204,8 +208,6 @@ def create_app():
             today=today.isoformat(),
         )
 
-
-    
     @app.route("/my-bookings")
     @login_required
     def my_bookings():
@@ -222,8 +224,7 @@ def create_app():
             "main/my_bookings.html",
             bookings=bookings,
         )
-        
-        
+
     @app.route("/staff/approvals")
     @login_required
     def staff_approvals():
@@ -288,7 +289,5 @@ def create_app():
             flash("Booking rejected successfully.", "success")
 
         return redirect(url_for("staff_approvals"))
-
-
 
     return app
