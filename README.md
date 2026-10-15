@@ -204,9 +204,9 @@ The project responsibilities are divided into five modules.
 
 | Module | Main Responsibility | Assigned Member |
 |---|---|---|
-| M1 | Accounts and Authentication | Kalana (Member 2) |
-| M2 | Equipment Catalogue | G.H.B.A. Achintha (Member 3) |
-| M3 | Booking Form and Booking Model | Devindu (Member 4) |
+| M1 | Accounts and Authentication | Kalana |
+| M2 | Equipment Catalogue | G.H.B.A. Achintha|
+| M3 | Booking Form and Booking Model | Devindu |
 | M4 | Booking Validation and Tests | Akila Thikshana |
 | M5 | Approval, Integration and CI | Akila Thikshana |
 
