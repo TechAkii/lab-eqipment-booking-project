@@ -32,6 +32,10 @@ def create_app():
     with app.app_context():
         db.create_all()
 
+        from app.seed import seed_equipment
+
+        seed_equipment()
+
     app.register_blueprint(auth)
 
     @app.route("/")
