@@ -4,18 +4,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>{% block title %}UniLab Central{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <style>
+         :root {
+            --unilab-primary: #243b64;
+            --unilab-primary-dark: #182b4a;
+            --unilab-background: #f5f7fb;
+            --unilab-text: #253047;
+            --unilab-muted: #718096;
+            --unilab-border: #e5eaf2;
+        }
+        
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: var(--unilab-background);
+            color: var(--unilab-text);
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        }
+        
+        .main-navbar {
+            background: var(--unilab-primary-dark);
+            box-shadow: 0 3px 14px rgba(20, 35, 60, 0.12);
+        }
+        
+        .navbar-brand {
+            font-size: 1.25rem;
+            font-weight: 750;
+            letter-spacing: -0.4px;
+        }
+        
+        .brand-icon {
+            display: inline-flex;
+            width: 36px;
+            height: 36px;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.13);
+        }
+        
+        .main-navbar .nav-link {
+            color: rgba(255, 255, 255, 0.82);
+            padding: 0.65rem 0.8rem;
+            border-radius: 8px;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        
+        .main-navbar .nav-link:hover,
+        .main-navbar .nav-link:focus {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .user-greeting {
+            color: #fff;
+            font-size: 0.9rem;
+        }
+        
+        main {
+            flex: 1;
+            width: 100%;
+        }
+        
+        .page-container {
+            width: 100%;
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 1.75rem 1rem;
+        }
+        
+        .card {
+            border: 1px solid var(--unilab-border);
+            border-radius: 14px;
+        }
+        
+        .card-header {
+            border-bottom-color: var(--unilab-border);
+        }
+        
+        .form-control,
+        .form-select {
+            min-height: 44px;
+            border-color: #d9e0eb;
+            border-radius: 8px;
+        }
+        
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #7895c5;
+            box-shadow: 0 0 0 0.2rem rgba(36, 59, 100, 0.12);
+        }
+        
+        .btn {
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        
+        .btn-primary {
+            background: var(--unilab-primary);
+            border-color: var(--unilab-primary);
+        }
+        
+        .btn-primary:hover {
+            background: var(--unilab-primary-dark);
+            border-color: var(--unilab-primary-dark);
+        }
+        
+        .table thead th {
+            color: #536078;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.035em;
+            white-space: nowrap;
+        }
+        
+        .alert {
+            border: 0;
+            border-radius: 10px;
+        }
+        
+        .site-footer {
+            margin-top: auto;
+            padding: 1.25rem 0;
+            border-top: 1px solid var(--unilab-border);
+            background: #fff;
+            color: var(--unilab-muted);
+            font-size: 0.875rem;
+        }
+        
+        @media (max-width: 991.98px) {
+            .main-navbar .navbar-nav {
+                padding-top: 0.75rem;
+            }
+            .main-navbar .nav-link {
+                margin-bottom: 0.2rem;
+            }
+            .nav-actions {
+                padding: 0.5rem 0;
+            }
+            .page-container {
+                padding: 1.25rem 0.85rem;
+            }
+        }
+    </style>
+
+    {% block extra_head %}{% endblock %}
 </head>
 
 <body>
 
-    <!-- Main Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
+    <!-- Main Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark main-navbar">
+        <div class="container-fluid px-lg-4">
 
-            <a class="navbar-brand" href="{{ url_for('catalogue') }}">
-                UniLab Central
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('catalogue') }}">
+                <span class="brand-icon">
+                    <i class="bi bi-mortarboard-fill"></i>
+                </span> UniLab Central
             </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,40 +181,79 @@
 
             <div class="collapse navbar-collapse" id="mainNavbar">
 
-                <div class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-lg-4 me-auto">
 
-                    <a class="nav-link" href="{{ url_for('catalogue') }}">
-        Equipment Catalogue
-    </a> {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('catalogue') }}">
+                            <i class="bi bi-grid me-1"></i> Equipment Catalogue
+                        </a>
+                    </li>
 
-                    <a class="nav-link" href="{{ url_for('my_bookings') }}">
-            My Bookings
-        </a>
+                    {% if current_user.is_authenticated %} {% if current_user.role == "Student" %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('my_bookings') }}">
+                            <i class="bi bi-calendar-check me-1"></i> My Bookings
+                        </a>
+                    </li>
+                    {% endif %} {% if current_user.role == "Staff" %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('staff_approvals') }}">
+                            <i class="bi bi-clipboard-check me-1"></i> Booking Approvals
+                        </a>
+                    </li>
+                    {% endif %} {% if current_user.role == "Admin" %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                            <i class="bi bi-speedometer2 me-1"></i> Dashboard
+                        </a>
+                    </li>
 
-                    <span class="navbar-text text-light me-lg-3">
-            Hello, {{ current_user.username }}
-        </span>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_users') }}">
+                            <i class="bi bi-people me-1"></i> User Management
+                        </a>
+                    </li>
+                    {% endif %} {% endif %}
+                </ul>
+
+                <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-2 nav-actions">
+
+                    {% if current_user.is_authenticated %}
+
+                    <span class="user-greeting me-lg-2">
+                            <i class="bi bi-person-circle me-1"></i>
+                            {{ current_user.username }}
+                            <span class="badge bg-light text-dark ms-1">
+                                {{ current_user.role }}
+                            </span>
+                    </span>
 
                     <form method="POST" action="{{ url_for('auth.logout') }}" class="d-inline">
-                        <button type="submit" class="btn btn-outline-light mt-2 mt-lg-0">
-                Logout
-            </button>
+                        <button type="submit" class="btn btn-outline-light btn-sm px-3">
+                                <i class="bi bi-box-arrow-right me-1"></i>
+                                Logout
+                            </button>
                     </form>
 
                     {% else %}
 
-                    <a class="nav-link" href="{{ url_for('auth.login') }}">
-            Login
-        </a>
+                    <a class="btn btn-outline-light btn-sm px-3" href="{{ url_for('auth.login') }}">
+                            Login
+                        </a>
 
-                    <a class="nav-link" href="{{ url_for('auth.register') }}">
-            Register
-        </a> {% endif %}
+                    <a class="btn btn-light btn-sm px-3" href="{{ url_for('auth.register') }}">
+                            Register
+                        </a>
 
-                    <a class="btn btn-outline-light ms-lg-3 mt-2 mt-lg-0" href="{{ url_for('admin_login') }}">
-        Admin Panel
-    </a>
+                    <a class="btn btn-outline-light btn-sm px-3" href="{{ url_for('staff_login') }}">
+                            Staff
+                        </a>
 
+                    <a class="btn btn-warning btn-sm px-3" href="{{ url_for('admin_login') }}">
+                        <i class="bi bi-shield-lock me-1"></i> Admin
+                    </a>
+
+                    {% endif %}
                 </div>
 
             </div>
@@ -66,10 +262,44 @@
 
     <!-- Page Content -->
     <main>
-        {% block content %}{% endblock %}
+        <div class="container-fluid">
+            <div class="page-container">
+
+                <!-- Flash messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm mb-4" role="alert">
+                    {{ message }}
+
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %} {% endif %} {% endwith %} {% block content %}{% endblock %}
+
+            </div>
+        </div>
     </main>
 
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container-fluid px-lg-4">
+            <div class="d-flex flex-column flex-md-row
+                        justify-content-between align-items-md-center gap-2">
+                <span>
+                    <i class="bi bi-mortarboard me-1"></i>
+                    <strong>UniLab Central</strong>
+                    &mdash; Lab Equipment Booking System
+                </span>
+
+                <span>
+                    Built for university laboratory management
+                </span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    {% block extra_scripts %}{% endblock %}
 
 </body>
 
