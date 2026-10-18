@@ -1,7 +1,14 @@
- {% extends "base.html" %} {% block title %}Admin Dashboard | UniLab Central{% endblock %} {% block content %}
-<div class="container py-5">
+{% extends "base.html" %} {% block content %}
+<div class="container py-4">
     <h1>Admin Dashboard</h1>
-    <p>Welcome to the UniLab Central administration panel.</p>
-    <p>You are signed in as an administrator.</p>
+
+    <p>Total Users: {{ total_users }}</p>
+    <p>Total Equipment: {{ total_equipment }}</p>
+    <p>Pending Bookings: {{ pending_bookings }}</p>
+    <p>Approved Bookings: {{ approved_bookings }}</p>
+
+    <a href="{{ url_for('admin_users') }}" class="btn btn-dark">
+        Manage Users
+    </a>
 </div>
 {% endblock %}

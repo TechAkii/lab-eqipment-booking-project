@@ -2,9 +2,12 @@
 from datetime import date, datetime, time
 
 from flask import Flask, flash, redirect, render_template, request, url_for
-from flask_login import current_user, login_required
+from flask_login import current_user, login_required, login_user, logout_user
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.extensions import db, login_manager
+from app.models import User
+from app.permissions import role_required
 
 
 def create_app():
@@ -18,16 +21,203 @@ def create_app():
     login_manager.init_app(app)
     login_manager.login_view = "auth.login"
 
-    from app.models import Booking, Equipment, User
+    from app.models import Booking, Equipment
     from app.routes.auth import auth
-
-    @app.route("/admin/login", methods=["GET", "POST"])
-    def admin_login():
-        return render_template("admin/login.html")
 
     @login_manager.user_loader
     def load_user(user_id):
         return db.session.get(User, int(user_id))
+
+    # -------------------- ADMIN LOGIN --------------------
+
+    @app.route("/admin/login", methods=["GET", "POST"])
+    def admin_login():
+        if current_user.is_authenticated:
+            if current_user.role == "Admin":
+                return redirect(url_for("admin_dashboard"))
+            logout_user()
+
+        if request.method == "POST":
+            username_or_email = request.form.get("username", "").strip()
+            password = request.form.get("password", "")
+
+            user = User.query.filter(
+                db.or_(
+                    User.username == username_or_email,
+                    User.email == username_or_email.lower(),
+                )
+            ).first()
+
+            if (
+                user
+                and user.role == "Admin"
+                and check_password_hash(user.password_hash, password)
+            ):
+                login_user(user)
+                flash("Admin login successful.", "success")
+                return redirect(url_for("admin_dashboard"))
+
+            flash("Invalid administrator credentials.", "danger")
+
+        return render_template("admin/login.html")
+
+    # -------------------- ADMIN DASHBOARD --------------------
+
+    @app.route("/admin/dashboard")
+    @role_required("Admin")
+    def admin_dashboard():
+        return render_template(
+            "admin/dashboard.html",
+            total_users=User.query.count(),
+            total_students=User.query.filter_by(role="Student").count(),
+            total_staff=User.query.filter_by(role="Staff").count(),
+            total_admins=User.query.filter_by(role="Admin").count(),
+            total_equipment=Equipment.query.count(),
+            pending_bookings=Booking.query.filter_by(
+                status="Pending"
+            ).count(),
+            approved_bookings=Booking.query.filter_by(
+                status="Approved"
+            ).count(),
+            rejected_bookings=Booking.query.filter_by(
+                status="Rejected"
+            ).count(),
+        )
+
+    # -------------------- ADMIN USER MANAGEMENT --------------------
+
+    @app.route("/admin/users")
+    @role_required("Admin")
+    def admin_users():
+        users = User.query.order_by(User.username).all()
+
+        return render_template(
+            "admin/users.html",
+            users=users,
+        )
+
+    @app.route("/admin/users/create", methods=["POST"])
+    @role_required("Admin")
+    def admin_create_user():
+        username = request.form.get("username", "").strip()
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
+        role = request.form.get("role", "")
+
+        if not username or not email or not password:
+            flash("All fields are required.", "danger")
+            return redirect(url_for("admin_users"))
+
+        if len(username) > 80 or len(email) > 120:
+            flash("Username or email is too long.", "danger")
+            return redirect(url_for("admin_users"))
+
+        if role not in {"Staff", "Admin"}:
+            flash(
+                "Only Staff and Admin accounts can be created here.",
+                "danger",
+            )
+            return redirect(url_for("admin_users"))
+
+        if len(password) < 8:
+            flash("Password must contain at least 8 characters.", "danger")
+            return redirect(url_for("admin_users"))
+
+        existing_user = User.query.filter(
+            db.or_(
+                User.username == username,
+                User.email == email,
+            )
+        ).first()
+
+        if existing_user:
+            flash("Username or email already exists.", "danger")
+            return redirect(url_for("admin_users"))
+
+        user = User(
+            username=username,
+            email=email,
+            password_hash=generate_password_hash(password),
+            role=role,
+        )
+
+        db.session.add(user)
+        db.session.commit()
+
+        flash(f"{role} account created successfully.", "success")
+        return redirect(url_for("admin_users"))
+
+    @app.route(
+        "/admin/users/<int:user_id>/delete",
+        methods=["POST"],
+    )
+    @role_required("Admin")
+    def admin_delete_user(user_id):
+        user = db.session.get(User, user_id)
+
+        if user is None:
+            flash("User not found.", "danger")
+            return redirect(url_for("admin_users"))
+
+        if user.id == current_user.id:
+            flash("You cannot remove your own Admin account.", "danger")
+            return redirect(url_for("admin_users"))
+
+        if user.role not in {"Student", "Staff"}:
+            flash(
+                "Only Student and Staff accounts can be removed here.",
+                "danger",
+            )
+            return redirect(url_for("admin_users"))
+
+        # Preserve booking history.
+        if user.bookings:
+            flash(
+                "This account has booking history and cannot be deleted.",
+                "warning",
+            )
+            return redirect(url_for("admin_users"))
+
+        db.session.delete(user)
+        db.session.commit()
+
+        flash("User account removed successfully.", "success")
+        return redirect(url_for("admin_users"))
+
+    # -------------------- STAFF LOGIN --------------------
+
+    @app.route("/staff/login", methods=["GET", "POST"])
+    def staff_login():
+        if current_user.is_authenticated:
+            if current_user.role == "Staff":
+                return redirect(url_for("staff_approvals"))
+            logout_user()
+
+        if request.method == "POST":
+            username_or_email = request.form.get("username", "").strip()
+            password = request.form.get("password", "")
+
+            user = User.query.filter(
+                db.or_(
+                    User.username == username_or_email,
+                    User.email == username_or_email.lower(),
+                )
+            ).first()
+
+            if (
+                user
+                and user.role == "Staff"
+                and check_password_hash(user.password_hash, password)
+            ):
+                login_user(user)
+                flash("Staff login successful.", "success")
+                return redirect(url_for("staff_approvals"))
+
+            flash("Invalid staff credentials.", "danger")
+
+        return render_template("staff/login.html")
+
+    # -------------------- DATABASE INITIALIZATION --------------------
 
     with app.app_context():
         db.create_all()
@@ -38,20 +228,26 @@ def create_app():
 
     app.register_blueprint(auth)
 
+    # -------------------- EQUIPMENT CATALOGUE --------------------
+
     @app.route("/")
     def home():
+        equipment_items = Equipment.query.order_by(Equipment.name).all()
+
+        categories = [
+            category
+            for (category,) in (
+                db.session.query(Equipment.category)
+                .distinct()
+                .order_by(Equipment.category)
+                .all()
+            )
+        ]
+
         return render_template(
             "main/catalogue.html",
-            equipment_items=Equipment.query.order_by(Equipment.name).all(),
-            categories=[
-                category
-                for (category,) in (
-                    db.session.query(Equipment.category)
-                    .distinct()
-                    .order_by(Equipment.category)
-                    .all()
-                )
-            ],
+            equipment_items=equipment_items,
+            categories=categories,
         )
 
     @app.route("/catalogue")
@@ -70,9 +266,7 @@ def create_app():
             )
 
         if selected_category:
-            query = query.filter(
-                Equipment.category == selected_category
-            )
+            query = query.filter(Equipment.category == selected_category)
 
         equipment_items = query.order_by(Equipment.name).all()
 
@@ -91,6 +285,8 @@ def create_app():
             equipment_items=equipment_items,
             categories=categories,
         )
+
+    # -------------------- STUDENT BOOKING --------------------
 
     @app.route("/booking/new", methods=["GET", "POST"])
     @login_required
@@ -212,6 +408,8 @@ def create_app():
             today=today.isoformat(),
         )
 
+    # -------------------- MY BOOKINGS --------------------
+
     @app.route("/my-bookings")
     @login_required
     def my_bookings():
@@ -229,13 +427,11 @@ def create_app():
             bookings=bookings,
         )
 
-    @app.route("/staff/approvals")
-    @login_required
-    def staff_approvals():
-        if current_user.role != "Staff":
-            flash("Access denied. Staff members only.", "danger")
-            return redirect(url_for("catalogue"))
+    # -------------------- STAFF APPROVALS --------------------
 
+    @app.route("/staff/approvals")
+    @role_required("Staff")
+    def staff_approvals():
         pending_bookings = (
             Booking.query.filter_by(status="Pending")
             .order_by(Booking.booking_date, Booking.start_time)
@@ -247,13 +443,12 @@ def create_app():
             bookings=pending_bookings,
         )
 
-    @app.route("/staff/approvals/<int:booking_id>/approve", methods=["POST"])
-    @login_required
+    @app.route(
+        "/staff/approvals/<int:booking_id>/approve",
+        methods=["POST"],
+    )
+    @role_required("Staff")
     def approve_booking(booking_id):
-        if current_user.role != "Staff":
-            flash("Access denied. Staff members only.", "danger")
-            return redirect(url_for("catalogue"))
-
         booking = db.session.get(Booking, booking_id)
 
         if booking is None:
@@ -267,13 +462,12 @@ def create_app():
 
         return redirect(url_for("staff_approvals"))
 
-    @app.route("/staff/approvals/<int:booking_id>/reject", methods=["POST"])
-    @login_required
+    @app.route(
+        "/staff/approvals/<int:booking_id>/reject",
+        methods=["POST"],
+    )
+    @role_required("Staff")
     def reject_booking(booking_id):
-        if current_user.role != "Staff":
-            flash("Access denied. Staff members only.", "danger")
-            return redirect(url_for("catalogue"))
-
         booking = db.session.get(Booking, booking_id)
 
         if booking is None:
@@ -284,7 +478,10 @@ def create_app():
             reason = request.form.get("rejection_reason", "").strip()
 
             if not reason:
-                flash("Please provide a reason for rejection.", "danger")
+                flash(
+                    "Please provide a reason for rejection.",
+                    "danger",
+                )
                 return redirect(url_for("staff_approvals"))
 
             booking.status = "Rejected"
