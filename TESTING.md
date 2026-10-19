@@ -90,19 +90,6 @@ python -m pytest --cov=app --cov-report=term-missing
 
 Coverage results identify which application code was exercised by the tests. Coverage percentage alone does not guarantee that all requirements are tested.
 
-### 5.5 Test result recording
-
-After running the tests, record the actual results:
-
-- Test command: `python -m pytest -v`
-- Date tested: [Enter the actual test date]
-- Total tests: [Enter actual count]
-- Passed: [Enter actual count]
-- Failed: [Enter actual count]
-- Skipped: [Enter actual count, if applicable]
-
-Record any failures and their resolutions. Do not record a successful result unless the tests have completed successfully.
-
 ## 6. Check Code Quality with Ruff
 
 Run the following command to check for linting issues:
@@ -114,13 +101,6 @@ ruff check .
 Review any reported issues and correct them where appropriate.
 
 Run the command again to verify the result.
-
-Record the actual result:
-
-- Command: `ruff check .`
-- Result: [Enter actual result]
-- Issues found: [Enter actual result]
-- Issues resolved: [Enter actual result]
 
 ## 7. Test Authentication and User Management (FR-00)
 
@@ -143,8 +123,6 @@ Perform the following manual checks where applicable:
 
 Admin and Staff account creation should also be checked using the account-management process implemented in the application.
 
-Record the actual result of each scenario during testing.
-
 ## 8. Test Equipment Catalogue (FR-01)
 
 The purpose of these tests is to verify equipment browsing, category filtering, equipment availability, and management functionality.
@@ -159,8 +137,6 @@ The purpose of these tests is to verify equipment browsing, category filtering, 
 | FR01-T06 | Staff deletes equipment, where permitted | Equipment is removed according to the application's rules |
 | FR01-T07 | Mark equipment as unavailable | The equipment status is updated and unavailable equipment cannot be booked |
 
-For each test, record the actual result and any issues encountered.
-
 ## 9. Test Booking Requests (FR-02)
 
 The purpose of these tests is to verify that Students can submit booking requests and view their booking records.
@@ -173,8 +149,6 @@ The purpose of these tests is to verify that Students can submit booking request
 | FR02-T04 | Submit a request with missing or invalid details | The request is rejected with appropriate feedback |
 | FR02-T05 | Attempt to access another user's booking data | Access is restricted according to the application's authorization rules |
 
-Record the actual result of each scenario.
-
 ## 10. Initial FR-03 Test Design — Booking Validation
 
 ### 10.1 Objective
@@ -183,7 +157,7 @@ FR-03 focuses on validating equipment booking requests to prevent invalid durati
 
 The following test cases define the initial test design. Each case should be checked against the project requirements and the implemented validation rules.
 
-### 10.2 Test cases
+### 10.2 Test Cases
 
 | Test ID | Test Scenario | Test Input / Condition | Expected Result |
 |---|---|---|---|
@@ -196,32 +170,11 @@ The following test cases define the initial test design. Each case should be che
 | FR03-T07 | Unavailable equipment | Requested equipment is marked unavailable or out of service | Booking is rejected |
 | FR03-T08 | Valid non-overlapping booking | Requested interval does not conflict with a blocking booking | Booking may be accepted if all other rules pass |
 
-### 10.3 Test design and execution status
+### 10.3 Test Design and Execution
 
 The initial test design defines the scenarios and expected results before or during implementation.
 
-For each test case, record:
-
-- Whether the validation rule has been implemented.
-- Whether an automated test exists.
-- The actual execution result.
-- Any defect identified.
-- The corrective action and retest result, if applicable.
-
-Use the following table to track progress:
-
-| Test ID | Automated Test Implemented? | Execution Result |
-|---|---|---|
-| FR03-T01 | [Yes] | [Pass] |
-| FR03-T02 | [Yes] | [Pass] |
-| FR03-T03 | [Yes] | [Pass] |
-| FR03-T04 | [Yes] | [Pass] |
-| FR03-T05 | [Yes] | [Pass] |
-| FR03-T06 | [Yes] | [Pass] |
-| FR03-T07 | [Yes] | [Pass] |
-| FR03-T08 | [Yes] | [Pass] |
-
-These status fields must be completed using the actual test implementation and execution results.
+The test cases should be compared with the implemented validation logic. Where automated tests exist, their execution results can be reviewed through the pytest output.
 
 ## 11. Test Staff Booking Approval (FR-04)
 
@@ -236,8 +189,6 @@ The purpose of these tests is to verify that Staff can review booking requests a
 | FR04-T05 | Unauthorized user attempts to approve or reject a booking | The operation is denied |
 | FR04-T06 | Attempt to approve or reject an already processed booking | The operation is rejected according to the application's rules |
 
-Record the actual result of each scenario.
-
 ## 12. Continuous Integration (CI)
 
 The project uses GitHub Actions to automate configured quality checks.
@@ -249,32 +200,22 @@ To verify CI:
 3. Open the relevant workflow run.
 4. Check the status of the pytest and Ruff steps, where configured.
 5. Open the associated pull request, if applicable.
-6. Record the result and retain a screenshot as assessment evidence.
+6. Retain a screenshot of the workflow results as assessment evidence.
 
 Local test results and GitHub Actions results should be checked separately.
-
-Record:
-
-- Workflow name: [Enter actual workflow name]
-- Branch or pull request: [Enter branch or PR]
-- Run date: [Enter actual date]
-- Result: [Passed/Failed/Cancelled]
-- Failed steps and corrective actions: [If applicable]
 
 ## 13. Pull Request and Code Review Testing Evidence
 
 Code changes should be reviewed through the project's pull request workflow.
 
-For assessment evidence, verify and record:
+For assessment evidence, review the following:
 
 - Pull request title and linked issue.
 - Source branch and target branch.
 - Files changed.
 - Reviewer comments and review status.
 - CI check results.
-- Any corrections made in response to review feedback.
-
-Only describe a pull request as peer-reviewed or approved when the GitHub review record confirms that status.
+- Corrections made in response to review feedback.
 
 ## 14. GitHub Issues and Project Board
 
@@ -302,21 +243,7 @@ For each failure or defect, record:
 
 Retest affected functionality after applying a fix.
 
-## 16. Testing Summary
-
-Complete this summary using verified results.
-
-| Check | Actual Result |
-|---|---|
-| Application starts successfully | [Passed — application started successfully] |
-| Automated pytest suite | [7 passed] |
-| Coverage report | [Total tests passed: 7] |
-| Ruff code-quality check | [All checked] |
-
-
-The testing summary should reflect the latest verified results rather than assumed outcomes.
-
-## 17. Limitations and Future Testing
+## 16. Limitations and Future Testing
 
 Record any scenarios that are not yet automated, any known defects, and any test cases that require additional verification.
 
