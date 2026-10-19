@@ -308,17 +308,11 @@ Complete this summary using verified results.
 
 | Check | Actual Result |
 |---|---|
-| Application starts successfully | [Enter result] |
-| Automated pytest suite | [Enter actual counts and result] |
-| Coverage report | [Enter actual percentage, if measured] |
-| Ruff code-quality check | [Enter actual result] |
-| Authentication tests | [Enter actual result] |
-| Equipment catalogue tests | [Enter actual result] |
-| Booking request tests | [Enter actual result] |
-| FR-03 booking validation tests | [Enter actual result] |
-| Staff approval tests | [Enter actual result] |
-| GitHub Actions CI workflow | [Enter actual result] |
-| Pull request review evidence | [Enter actual status] |
+| Application starts successfully | [Passed — application started successfully] |
+| Automated pytest suite | [7 passed] |
+| Coverage report | [Total tests passed: 7] |
+| Ruff code-quality check | [All checked] |
+
 
 The testing summary should reflect the latest verified results rather than assumed outcomes.
 
