@@ -458,12 +458,8 @@ def create_app(test_config=None):
             .all()
         )
 
-        now = datetime.now().astimezone()
-        current_time = now.time().replace(
-            tzinfo=None,
-            second=0,
-            microsecond=0,
-        )
+        
+        
 
         return render_template(
             "staff/approvals.html",
