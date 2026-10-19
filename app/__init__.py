@@ -452,29 +452,18 @@ def create_app(test_config=None):
     @app.route("/staff/approvals")
     @role_required("Staff")
     def staff_approvals():
-        # Staff can view all students' booking records. The template
-        # should show Approve/Reject actions only for Pending bookings.
-        bookings = (
-            Booking.query
-            .order_by(
-                Booking.booking_date.desc(),
-                Booking.start_time.desc(),
-            )
+        pending_bookings = (
+            Booking.query.filter_by(status="Pending")
+            .order_by(Booking.booking_date, Booking.start_time)
             .all()
         )
 
-        now = datetime.now().astimezone()
-        current_time = now.time().replace(
-            tzinfo=None,
-            second=0,
-            microsecond=0,
-        )
+        
+        
 
         return render_template(
             "staff/approvals.html",
-            bookings=bookings,
-            today=now.date(),
-            current_time=current_time,
+            bookings=pending_bookings,
         )
 
     @app.route(
