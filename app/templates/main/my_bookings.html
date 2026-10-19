@@ -3,8 +3,8 @@
     <div class="mb-4">
         <span class="eyebrow">EQUIPMENT RESERVATION</span>
         <h1 class="mt-2">My Bookings</h1>
-        <p class="muted">
-            View your equipment booking requests and their current status.
+        <p class="text-muted">
+            View all your bookings, including pending, approved, rejected, upcoming, and past reservations.
         </p>
     </div>
 
@@ -22,24 +22,27 @@
                     <th>Start Time</th>
                     <th>End Time</th>
                     <th>Status</th>
+                    <th>Booking Period</th>
                 </tr>
             </thead>
 
             <tbody>
                 {% for booking in bookings %}
                 <tr>
-                    <td>
-                        {{ booking.equipment.name }}
-                    </td>
+                    <td>{{ booking.equipment.name }}</td>
+
                     <td>
                         {{ booking.booking_date.strftime("%Y-%m-%d") }}
                     </td>
+
                     <td>
                         {{ booking.start_time.strftime("%I:%M %p") }}
                     </td>
+
                     <td>
                         {{ booking.end_time.strftime("%I:%M %p") }}
                     </td>
+
                     <td>
                         {% if booking.status == "Approved" %}
                         <span class="badge bg-success">
@@ -47,10 +50,28 @@
                                     </span> {% elif booking.status == "Rejected" %}
                         <span class="badge bg-danger">
                                         Rejected
-                                    </span> {% else %}
+                                    </span> {% elif booking.status == "Pending" %}
                         <span class="badge bg-warning text-dark">
+                                        Pending
+                                    </span> {% else %}
+                        <span class="badge bg-secondary">
                                         {{ booking.status }}
                                     </span> {% endif %}
+                    </td>
+
+                    <td>
+                        {% if booking.booking_date
+                        < today or ( booking.booking_date==today and booking.end_time <=current_time ) %} <span class="badge bg-secondary">
+                            Past
+                            </span>
+                            {% else %}
+                            <span class="badge bg-primary">
+                                        Upcoming
+                                    </span> {% endif %} {% if booking.status == "Rejected" and booking.rejection_reason %}
+                            <div class="small text-danger mt-2">
+                                <strong>Reason:</strong> {{ booking.rejection_reason }}
+                            </div>
+                            {% endif %}
                     </td>
                 </tr>
                 {% endfor %}

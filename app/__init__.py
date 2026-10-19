@@ -10,12 +10,15 @@ from app.models import User
 from app.permissions import role_required
 
 
-def create_app():
+def create_app(test_config=None):
     app = Flask(__name__)
 
     app.config["SECRET_KEY"] = "development-secret-key"
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///lab_equipment.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+    if test_config:
+        app.config.update(test_config)
 
     db.init_app(app)
     login_manager.init_app(app)
@@ -413,6 +416,14 @@ def create_app():
     @app.route("/my-bookings")
     @login_required
     def my_bookings():
+        # This page is intended for students. Staff and Admin users
+        # must not access a student's personal booking history page.
+        if current_user.role != "Student":
+            flash("This page is for Student accounts only.", "danger")
+            return redirect(url_for("catalogue"))
+
+        # Return every booking for the logged-in student, including
+        # Pending, Approved, Rejected, and bookings in the past.
         bookings = (
             Booking.query.filter_by(user_id=current_user.id)
             .order_by(
@@ -422,9 +433,18 @@ def create_app():
             .all()
         )
 
+        now = datetime.now().astimezone()
+        current_time = now.time().replace(
+            tzinfo=None,
+            second=0,
+            microsecond=0,
+        )
+
         return render_template(
             "main/my_bookings.html",
             bookings=bookings,
+            today=now.date(),
+            current_time=current_time,
         )
 
     # -------------------- STAFF APPROVALS --------------------
@@ -432,18 +452,22 @@ def create_app():
     @app.route("/staff/approvals")
     @role_required("Staff")
     def staff_approvals():
-        bookings = (
-            Booking.query
-            .order_by(
-                Booking.booking_date.desc(),
-                Booking.start_time.desc()
-            )
+        pending_bookings = (
+            Booking.query.filter_by(status="Pending")
+            .order_by(Booking.booking_date, Booking.start_time)
             .all()
+        )
+
+        now = datetime.now().astimezone()
+        current_time = now.time().replace(
+            tzinfo=None,
+            second=0,
+            microsecond=0,
         )
 
         return render_template(
             "staff/approvals.html",
-            bookings=bookings
+            bookings=pending_bookings,
         )
 
     @app.route(

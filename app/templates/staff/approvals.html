@@ -1,11 +1,9 @@
- {% extends "base.html" %} {% block title %}Booking Approvals | UniLab Central{% endblock %} {% block content %}
+ {% extends "base.html" %} {% block title %}Staff Approvals | UniLab Central{% endblock %} {% block content %}
 <section class="container py-4">
-    <div class="mb-4">
-        <h1>Booking Approvals</h1>
-        <p class="text-muted">
-            Review student requests and manage booking history.
-        </p>
-    </div>
+    <h1>Booking Approvals</h1>
+    <p class="text-muted">
+        Review student requests and approve or reject pending bookings.
+    </p>
 
     {% with messages = get_flashed_messages(with_categories=true) %} {% for category, message in messages %}
     <div class="alert alert-{{ category }}" role="alert">
@@ -38,49 +36,46 @@
                     <th>Date</th>
                     <th>Start</th>
                     <th>End</th>
-                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
+
             <tbody>
                 {% for booking in bookings %}
                 <tr class="booking-row" data-status="{{ booking.status }}">
                     <td>{{ booking.user.username }}</td>
                     <td>{{ booking.equipment.name }}</td>
-                    <td>{{ booking.booking_date.strftime("%Y-%m-%d") }}</td>
-                    <td>{{ booking.start_time.strftime("%I:%M %p") }}</td>
-                    <td>{{ booking.end_time.strftime("%I:%M %p") }}</td>
+
                     <td>
-                        {% if booking.status == "Pending" %}
-                        <span class="badge text-bg-warning">Pending</span> {% elif booking.status == "Approved" %}
-                        <span class="badge text-bg-success">Approved</span> {% elif booking.status == "Rejected" %}
-                        <span class="badge text-bg-danger">Rejected</span> {% else %}
-                        <span class="badge text-bg-secondary">
-                                    {{ booking.status }}
-                                </span> {% endif %} {% if booking.rejection_reason %}
-                        <div class="small text-muted mt-1">
-                            Reason: {{ booking.rejection_reason }}
-                        </div>
-                        {% endif %}
+                        {{ booking.booking_date.strftime("%Y-%m-%d") }}
                     </td>
+
                     <td>
-                        {% if booking.status == "Pending" %}
+                        {{ booking.start_time.strftime("%I:%M %p") }}
+                    </td>
+
+                    <td>
+                        {{ booking.end_time.strftime("%I:%M %p") }}
+                    </td>
+
+                    <td>
                         <form method="post" action="{{ url_for('approve_booking', booking_id=booking.id) }}" class="mb-2">
                             <button class="btn btn-success btn-sm" type="submit">
-                                        Approve
-                                    </button>
+                                            Approve
+                                        </button>
                         </form>
 
-                        <form method="post" action="{{ url_for('reject_booking', booking_id=booking.id) }}">
-                            <input type="text" name="rejection_reason" class="form-control form-control-sm mb-2" placeholder="Reason for rejection" required>
+                        <form method="post" action="{{ url_for(
+                                            'reject_booking',
+                                            booking_id=booking.id
+                                        ) }}">
+
+                            <input type="text" name="rejection_reason" class="form-control form-control-sm mb-2" placeholder="Reason for rejection" aria-label="Reason for rejection" required>
+
                             <button class="btn btn-danger btn-sm" type="submit">
-                                        Reject
-                                    </button>
+                                            Reject
+                                        </button>
                         </form>
-                        {% else %}
-                        <span class="text-muted small">
-                                    No actions available
-                                </span> {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
@@ -93,7 +88,7 @@
     </p>
     {% else %}
     <div class="alert alert-info">
-        There are no booking requests yet.
+        There are no pending booking requests.
     </div>
     {% endif %}
 </section>
