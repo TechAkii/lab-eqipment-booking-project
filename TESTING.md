@@ -212,14 +212,14 @@ Use the following table to track progress:
 
 | Test ID | Automated Test Implemented? | Execution Result |
 |---|---|---|
-| FR03-T01 | [Yes/No] | [Pass/Fail/Not run] |
-| FR03-T02 | [Yes/No] | [Pass/Fail/Not run] |
-| FR03-T03 | [Yes/No] | [Pass/Fail/Not run] |
-| FR03-T04 | [Yes/No] | [Pass/Fail/Not run] |
-| FR03-T05 | [Yes/No] | [Pass/Fail/Not run] |
-| FR03-T06 | [Yes/No] | [Pass/Fail/Not run] |
-| FR03-T07 | [Yes/No] | [Pass/Fail/Not run] |
-| FR03-T08 | [Yes/No] | [Pass/Fail/Not run] |
+| FR03-T01 | [Yes] | [Pass] |
+| FR03-T02 | [Yes] | [Pass] |
+| FR03-T03 | [Yes] | [Pass] |
+| FR03-T04 | [Yes] | [Pass] |
+| FR03-T05 | [Yes] | [Pass] |
+| FR03-T06 | [Yes] | [Pass] |
+| FR03-T07 | [Yes] | [Pass] |
+| FR03-T08 | [Yes] | [Pass] |
 
 These status fields must be completed using the actual test implementation and execution results.
 
