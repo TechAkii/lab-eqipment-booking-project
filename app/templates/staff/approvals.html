@@ -1,15 +1,34 @@
- {% extends "base.html" %} {% block title %}Staff Approvals | UniLab Central{% endblock %} {% block content %}
+ {% extends "base.html" %} {% block title %}Booking Approvals | UniLab Central{% endblock %} {% block content %}
 <section class="container py-4">
-    <h1>Booking Approvals</h1>
-    <p class="text-muted">
-        Review student requests and approve or reject pending bookings.
-    </p>
+    <div class="mb-4">
+        <h1>Booking Approvals</h1>
+        <p class="text-muted">
+            Review student requests and manage booking history.
+        </p>
+    </div>
 
     {% with messages = get_flashed_messages(with_categories=true) %} {% for category, message in messages %}
     <div class="alert alert-{{ category }}" role="alert">
         {{ message }}
     </div>
-    {% endfor %} {% endwith %} {% if bookings %}
+    {% endfor %} {% endwith %}
+
+    <div class="d-flex flex-wrap gap-2 mb-4" role="group" aria-label="Filter bookings by status">
+        <button type="button" class="btn btn-primary status-filter active" data-filter="All" aria-pressed="true">
+            All
+        </button>
+        <button type="button" class="btn btn-outline-warning status-filter" data-filter="Pending" aria-pressed="false">
+            Pending
+        </button>
+        <button type="button" class="btn btn-outline-success status-filter" data-filter="Approved" aria-pressed="false">
+            Approved
+        </button>
+        <button type="button" class="btn btn-outline-danger status-filter" data-filter="Rejected" aria-pressed="false">
+            Rejected
+        </button>
+    </div>
+
+    {% if bookings %}
     <div class="table-responsive">
         <table class="table table-bordered table-hover align-middle">
             <thead class="table-light">
@@ -19,18 +38,33 @@
                     <th>Date</th>
                     <th>Start</th>
                     <th>End</th>
+                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for booking in bookings %}
-                <tr>
+                <tr class="booking-row" data-status="{{ booking.status }}">
                     <td>{{ booking.user.username }}</td>
                     <td>{{ booking.equipment.name }}</td>
                     <td>{{ booking.booking_date.strftime("%Y-%m-%d") }}</td>
                     <td>{{ booking.start_time.strftime("%I:%M %p") }}</td>
                     <td>{{ booking.end_time.strftime("%I:%M %p") }}</td>
                     <td>
+                        {% if booking.status == "Pending" %}
+                        <span class="badge text-bg-warning">Pending</span> {% elif booking.status == "Approved" %}
+                        <span class="badge text-bg-success">Approved</span> {% elif booking.status == "Rejected" %}
+                        <span class="badge text-bg-danger">Rejected</span> {% else %}
+                        <span class="badge text-bg-secondary">
+                                    {{ booking.status }}
+                                </span> {% endif %} {% if booking.rejection_reason %}
+                        <div class="small text-muted mt-1">
+                            Reason: {{ booking.rejection_reason }}
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if booking.status == "Pending" %}
                         <form method="post" action="{{ url_for('approve_booking', booking_id=booking.id) }}" class="mb-2">
                             <button class="btn btn-success btn-sm" type="submit">
                                         Approve
@@ -43,16 +77,74 @@
                                         Reject
                                     </button>
                         </form>
+                        {% else %}
+                        <span class="text-muted small">
+                                    No actions available
+                                </span> {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+
+    <p id="no-filter-results" class="alert alert-info d-none">
+        No bookings found for this status.
+    </p>
     {% else %}
     <div class="alert alert-info">
-        There are no pending booking requests.
+        There are no booking requests yet.
     </div>
     {% endif %}
 </section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const buttons = document.querySelectorAll(".status-filter");
+        const rows = document.querySelectorAll(".booking-row");
+        const emptyMessage = document.getElementById("no-filter-results");
+
+        buttons.forEach(function(button) {
+            button.addEventListener("click", function() {
+                const selectedStatus = button.dataset.filter;
+                let visibleCount = 0;
+
+                buttons.forEach(function(item) {
+                    const selected = item === button;
+                    item.classList.toggle("active", selected);
+                    item.setAttribute("aria-pressed", String(selected));
+
+                    const styles = {
+                        All: ["btn-primary", "btn-outline-primary"],
+                        Pending: ["btn-warning", "btn-outline-warning"],
+                        Approved: ["btn-success", "btn-outline-success"],
+                        Rejected: ["btn-danger", "btn-outline-danger"]
+                    };
+
+                    const [activeClass, inactiveClass] =
+                    styles[item.dataset.filter];
+
+                    item.classList.toggle(activeClass, selected);
+                    item.classList.toggle(inactiveClass, !selected);
+                });
+
+                rows.forEach(function(row) {
+                    const matches =
+                        selectedStatus === "All" ||
+                        row.dataset.status === selectedStatus;
+
+                    row.classList.toggle("d-none", !matches);
+
+                    if (matches) {
+                        visibleCount++;
+                    }
+                });
+
+                if (emptyMessage) {
+                    emptyMessage.classList.toggle("d-none", visibleCount > 0);
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

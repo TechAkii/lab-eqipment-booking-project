@@ -432,15 +432,18 @@ def create_app():
     @app.route("/staff/approvals")
     @role_required("Staff")
     def staff_approvals():
-        pending_bookings = (
-            Booking.query.filter_by(status="Pending")
-            .order_by(Booking.booking_date, Booking.start_time)
+        bookings = (
+            Booking.query
+            .order_by(
+                Booking.booking_date.desc(),
+                Booking.start_time.desc()
+            )
             .all()
         )
 
         return render_template(
             "staff/approvals.html",
-            bookings=pending_bookings,
+            bookings=bookings
         )
 
     @app.route(
