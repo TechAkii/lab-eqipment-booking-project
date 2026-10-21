@@ -1,29 +1,32 @@
- {% extends "base.html" %} {% block title %}Staff Approvals | UniLab Central{% endblock %} {% block content %}
+ {% extends "base.html" %} {% block title %}Booking Approvals | UniLab Central{% endblock %} {% block content %}
 <section class="container py-4">
-    <h1>Booking Approvals</h1>
-    <p class="text-muted">
-        Review student requests and approve or reject pending bookings.
-    </p>
 
-    {% with messages = get_flashed_messages(with_categories=true) %} {% for category, message in messages %}
-    <div class="alert alert-{{ category }}" role="alert">
-        {{ message }}
+    <div class="mb-4">
+        <h1 class="fw-bold">Booking Approvals</h1>
+        <p class="text-secondary">
+            Review student requests and view booking history.
+        </p>
     </div>
-    {% endfor %} {% endwith %}
 
-    <div class="d-flex flex-wrap gap-2 mb-4" role="group" aria-label="Filter bookings by status">
-        <button type="button" class="btn btn-primary status-filter active" data-filter="All" aria-pressed="true">
+    <!-- Booking filters -->
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        <button type="button" class="btn btn-primary filter-btn" data-filter="all">
             All
         </button>
-        <button type="button" class="btn btn-outline-warning status-filter" data-filter="Pending" aria-pressed="false">
+
+        <button type="button" class="btn btn-outline-warning filter-btn" data-filter="Pending">
             Pending
         </button>
-        <button type="button" class="btn btn-outline-success status-filter" data-filter="Approved" aria-pressed="false">
+
+        <button type="button" class="btn btn-outline-success filter-btn" data-filter="Approved">
             Approved
         </button>
-        <button type="button" class="btn btn-outline-danger status-filter" data-filter="Rejected" aria-pressed="false">
+
+        <button type="button" class="btn btn-outline-danger filter-btn" data-filter="Rejected">
             Rejected
         </button>
+
+
     </div>
 
     {% if bookings %}
@@ -36,15 +39,22 @@
                     <th>Date</th>
                     <th>Start</th>
                     <th>End</th>
+                    <th>Status</th>
+                    <th>Rejection Reason</th>
                     <th>Actions</th>
                 </tr>
             </thead>
 
             <tbody>
                 {% for booking in bookings %}
-                <tr class="booking-row" data-status="{{ booking.status }}">
-                    <td>{{ booking.user.username }}</td>
-                    <td>{{ booking.equipment.name }}</td>
+                <tr class="booking-row" data-status="{{ booking.status }}" data-date="{{ booking.booking_date.isoformat() }}">
+                    <td>
+                        {{ booking.user.username }}
+                    </td>
+
+                    <td>
+                        {{ booking.equipment.name }}
+                    </td>
 
                     <td>
                         {{ booking.booking_date.strftime("%Y-%m-%d") }}
@@ -59,23 +69,55 @@
                     </td>
 
                     <td>
-                        <form method="post" action="{{ url_for('approve_booking', booking_id=booking.id) }}" class="mb-2">
-                            <button class="btn btn-success btn-sm" type="submit">
-                                            Approve
-                                        </button>
-                        </form>
+                        {% if booking.status == "Pending" %}
+                        <span class="badge bg-warning text-dark">
+                                Pending
+                            </span> {% elif booking.status == "Approved" %}
+                        <span class="badge bg-success">
+                                Approved
+                            </span> {% elif booking.status == "Rejected" %}
+                        <span class="badge bg-danger">
+                                Rejected
+                            </span> {% else %}
+                        <span class="badge bg-secondary">
+                                {{ booking.status }}
+                            </span> {% endif %}
+                    </td>
 
-                        <form method="post" action="{{ url_for(
-                                            'reject_booking',
-                                            booking_id=booking.id
-                                        ) }}">
+                    <td>
+                        {% if booking.status == "Rejected" %} {{ booking.rejection_reason or "Not provided" }} {% else %}
+                        <span class="text-muted">—</span> {% endif %}
+                    </td>
 
-                            <input type="text" name="rejection_reason" class="form-control form-control-sm mb-2" placeholder="Reason for rejection" aria-label="Reason for rejection" required>
+                    <td>
+                        {% if booking.status == "Pending" %}
+                        <div class="d-flex flex-column gap-2">
 
-                            <button class="btn btn-danger btn-sm" type="submit">
-                                            Reject
-                                        </button>
-                        </form>
+                            <form method="POST" action="{{ url_for(
+                                        'approve_booking',
+                                        booking_id=booking.id
+                                    ) }}">
+                                <button type="submit" class="btn btn-success btn-sm w-100">
+                                        Approve
+                                    </button>
+                            </form>
+
+                            <form method="POST" action="{{ url_for(
+                                        'reject_booking',
+                                        booking_id=booking.id
+                                    ) }}">
+                                <input type="text" name="rejection_reason" class="form-control form-control-sm mb-2" placeholder="Reason for rejection" aria-label="Reason for rejection" required>
+
+                                <button type="submit" class="btn btn-danger btn-sm w-100">
+                                        Reject
+                                    </button>
+                            </form>
+
+                        </div>
+                        {% else %}
+                        <span class="text-muted small">
+                                Already reviewed
+                            </span> {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
@@ -84,62 +126,73 @@
     </div>
 
     <p id="no-filter-results" class="alert alert-info d-none">
-        No bookings found for this status.
+        No bookings match this filter.
     </p>
+
     {% else %}
     <div class="alert alert-info">
-        There are no pending booking requests.
+        There are no bookings to display.
     </div>
     {% endif %}
+
 </section>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        const buttons = document.querySelectorAll(".status-filter");
+        const filterButtons = document.querySelectorAll(".filter-btn");
         const rows = document.querySelectorAll(".booking-row");
-        const emptyMessage = document.getElementById("no-filter-results");
+        const noResults = document.getElementById("no-filter-results");
 
-        buttons.forEach(function(button) {
-            button.addEventListener("click", function() {
-                const selectedStatus = button.dataset.filter;
-                let visibleCount = 0;
+        function applyFilter(filter) {
+            let visibleCount = 0;
 
-                buttons.forEach(function(item) {
-                    const selected = item === button;
-                    item.classList.toggle("active", selected);
-                    item.setAttribute("aria-pressed", String(selected));
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
 
-                    const styles = {
-                        All: ["btn-primary", "btn-outline-primary"],
-                        Pending: ["btn-warning", "btn-outline-warning"],
-                        Approved: ["btn-success", "btn-outline-success"],
-                        Rejected: ["btn-danger", "btn-outline-danger"]
-                    };
+            rows.forEach(function(row) {
+                const status = row.dataset.status;
+                const bookingDate = new Date(
+                    row.dataset.date + "T00:00:00"
+                );
 
-                    const [activeClass, inactiveClass] =
-                    styles[item.dataset.filter];
+                const isPast = bookingDate < today;
 
-                    item.classList.toggle(activeClass, selected);
-                    item.classList.toggle(inactiveClass, !selected);
-                });
+                let showRow = false;
 
-                rows.forEach(function(row) {
-                    const matches =
-                        selectedStatus === "All" ||
-                        row.dataset.status === selectedStatus;
+                if (filter === "all") {
+                    showRow = true;
+                } else if (filter === "Past") {
+                    showRow = isPast;
+                } else {
+                    showRow = status === filter;
+                }
 
-                    row.classList.toggle("d-none", !matches);
+                row.classList.toggle("d-none", !showRow);
 
-                    if (matches) {
-                        visibleCount++;
-                    }
-                });
-
-                if (emptyMessage) {
-                    emptyMessage.classList.toggle("d-none", visibleCount > 0);
+                if (showRow) {
+                    visibleCount++;
                 }
             });
+
+            if (noResults) {
+                noResults.classList.toggle("d-none", visibleCount > 0);
+            }
+
+            filterButtons.forEach(function(button) {
+                const active = button.dataset.filter === filter;
+
+                button.classList.toggle("active", active);
+                button.setAttribute("aria-pressed", String(active));
+            });
+        }
+
+        filterButtons.forEach(function(button) {
+            button.addEventListener("click", function() {
+                applyFilter(button.dataset.filter);
+            });
         });
+
+        applyFilter("all");
     });
 </script>
 {% endblock %}
