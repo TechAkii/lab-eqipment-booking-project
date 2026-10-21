@@ -6,9 +6,10 @@ from flask_login import current_user, login_required, login_user, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.extensions import db, login_manager
-from app.models import User
+from app.models import Booking, User
 from app.permissions import role_required
-
+    
+    
 
 def create_app(test_config=None):
     app = Flask(__name__)
@@ -24,7 +25,7 @@ def create_app(test_config=None):
     login_manager.init_app(app)
     login_manager.login_view = "auth.login"
 
-    from app.models import Booking, Equipment
+    from app.models import Equipment
     from app.routes.auth import auth
 
     @login_manager.user_loader
@@ -449,22 +450,28 @@ def create_app(test_config=None):
 
     # -------------------- STAFF APPROVALS --------------------
 
+    
+    
+    # -------------------- STAFF APPROVALS --------------------
+
     @app.route("/staff/approvals")
     @role_required("Staff")
     def staff_approvals():
-        pending_bookings = (
-            Booking.query.filter_by(status="Pending")
-            .order_by(Booking.booking_date, Booking.start_time)
+        bookings = (
+            Booking.query
+            .order_by(
+                Booking.booking_date.desc(),
+                Booking.start_time.desc(),
+            )
             .all()
         )
 
-        
-        
-
         return render_template(
             "staff/approvals.html",
-            bookings=pending_bookings,
+            bookings=bookings,
         )
+
+
 
     @app.route(
         "/staff/approvals/<int:booking_id>/approve",
