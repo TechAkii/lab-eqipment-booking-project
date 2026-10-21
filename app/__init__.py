@@ -1,7 +1,7 @@
 
 from datetime import date, datetime, time
 
-from flask import Flask, app, flash, redirect, render_template, request, url_for
+from flask import Flask, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -24,7 +24,7 @@ def create_app(test_config=None):
     login_manager.init_app(app)
     login_manager.login_view = "auth.login"
 
-    from app.models import Booking, Equipment
+    from app.models import Equipment
     from app.routes.auth import auth
 
     @login_manager.user_loader
