@@ -8,7 +8,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from app.extensions import db, login_manager
 from app.models import Booking, User
 from app.permissions import role_required
-
+    
+    
 
 def create_app(test_config=None):
     app = Flask(__name__)
