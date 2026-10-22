@@ -1,4 +1,3 @@
-
 from datetime import date, datetime, time
 
 from flask import Flask, flash, redirect, render_template, request, url_for
@@ -260,6 +259,7 @@ def create_app(test_config=None):
         return render_template("staff/login.html")
 
     # -------------------- DATABASE INITIALIZATION --------------------
+
 
     # Creates database tables and inserts the default equipment records.
     with app.app_context():
