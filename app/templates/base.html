@@ -201,6 +201,11 @@
                             <i class="bi bi-clipboard-check me-1"></i> Booking Approvals
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('staff_equipment.manage_equipment') }}">
+                            <i class="bi bi-tools me-1"></i> Manage Equipment
+                        </a>
+                    </li>
                     {% endif %} {% if current_user.role == "Admin" %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
