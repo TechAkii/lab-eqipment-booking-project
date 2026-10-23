@@ -5,11 +5,12 @@ from flask_login import current_user, login_required, login_user, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.extensions import db, login_manager
-from app.models import Booking, User
+from app.models import Booking, Equipment, User
 from app.permissions import role_required
 
-
 # Creates the Flask application and configures its components, routes, and database.
+
+
 def create_app(test_config=None):
     # Initializes the Flask application.
     app = Flask(__name__)
@@ -28,9 +29,9 @@ def create_app(test_config=None):
     login_manager.init_app(app)
     login_manager.login_view = "auth.login"
 
-    # Imports the equipment model and authentication Blueprint.
-    from app.models import Equipment
+    # Imports the authentication and staff equipment-management Blueprints.
     from app.routes.auth import auth
+    from app.routes.equipment import staff_equipment
 
     # Loads the logged-in user from the database using the user ID stored in the session.
     @login_manager.user_loader
@@ -259,7 +260,6 @@ def create_app(test_config=None):
         return render_template("staff/login.html")
 
     # -------------------- DATABASE INITIALIZATION --------------------
-
 
     # Creates database tables and inserts the default equipment records.
     with app.app_context():
@@ -605,6 +605,9 @@ def create_app(test_config=None):
 
         # Returns to the staff approvals page after processing the request.
         return redirect(url_for("staff_approvals"))
+
+    # Registers the staff equipment-management routes.
+    app.register_blueprint(staff_equipment)
 
     # Returns the configured Flask application instance.
     return app
