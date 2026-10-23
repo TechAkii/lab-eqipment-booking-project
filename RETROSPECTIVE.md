@@ -9,7 +9,6 @@
 - Code quality was checked using Ruff, and a code review checklist was prepared.
 
 ## 2. What Could Be Improved?
-- Staff equipment management could be expanded to allow staff to add new equipment and update existing equipment details.
 - The equipment catalogue could include relevant images for each item to help students identify equipment easily.
 - Improve maintainability by separating each class and its responsibilities clearly.
 
