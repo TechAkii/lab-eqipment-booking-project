@@ -1,4 +1,7 @@
 # Lab Equipment Booking System
+        
+[![XERJ Corpus Hub contributor](https://hub.xerj.org/contributors/TechAkii/badge.svg)](https://hub.xerj.org/contributors/TechAkii)
+
 
 ## 1. Project Description
 
